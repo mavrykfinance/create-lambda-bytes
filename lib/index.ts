@@ -22,3 +22,17 @@ import { getLambdaFunction } from "./services/lambdaFunctionPacker.service"
     );
     console.log(lambdaFunction);
 })();
+
+export const createLambdaBytes = (
+
+    rpc: string,
+    governanceProxyContractAddress: string,
+    lambdaFunctionName: string,
+    lambdaFunctionParameters: Array<string>
+
+) => getLambdaFunction(
+    rpc,
+    governanceProxyContractAddress,
+    lambdaFunctionName,
+    lambdaFunctionParameters
+);

@@ -541,6 +541,10 @@ type setCollateralTokenActionType is [@layout:comb] record [
     empty       : unit;
 ]
 
+type updateType is 
+    |   Update of unit
+    |   Remove of unit
+
 type actionType is 
         // Default Entrypoint to Receive Tez
         Default                       of unit
