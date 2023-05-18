@@ -37,19 +37,11 @@ function getLigo (
 
     isDockerizedLigo: boolean,
     ligoVersion: string = "0.60.0",
-    isAppleSilicon: string = 'false',
-
 ) {
 
     let path = 'ligo'
-    let isAppleM1 = JSON.parse(isAppleSilicon)
-
     if (isDockerizedLigo) {
-        if (isAppleM1) {
-            path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i ligolang/ligo:${ligoVersion}`
-        } else {
-            path = `docker run -v $PWD:$PWD --rm -i mavrykdynamics/ligo:${ligoVersion}`
-        }
+        path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i ligolang/ligo:${ligoVersion}`
 
         try {
             execSync(`${path}  --help`)
@@ -63,13 +55,7 @@ function getLigo (
             execSync(`${path}  --help`)
 
         } catch (err) {
-
-            if (isAppleM1) {
-                path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i mavrykdynamics/ligo:${ligoVersion}`
-            } else {
-                path = `docker run -v $PWD:$PWD --rm -i mavrykdynamics/ligo:${ligoVersion}`
-            }
-
+            path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i ligolang/ligo:${ligoVersion}`
             execSync(`${path}  --help`)
         }
     }
@@ -81,11 +67,10 @@ const compileLambdaFunctionContract = async(
 
     contractPath: string = "",
     ligoVersion: string = "0.60.0",
-    isAppleSilicon: string = 'false',
 
 ) => {
 
-    const ligo = getLigo(true, ligoVersion, isAppleSilicon);
+    const ligo = getLigo(true, ligoVersion);
 
     const jsonFormat = execSync(
         `${ligo} compile contract ${contractPath} --michelson-format json --protocol lima`,
