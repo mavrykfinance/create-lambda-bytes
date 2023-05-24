@@ -1,6 +1,7 @@
-import * as fs from 'fs'
-import { execSync } from 'child_process';
 import { TezosToolkit } from '@taquito/taquito'
+import { execSync } from 'child_process';
+import * as fs from 'fs'
+
 import { generateProxyContract } from './lambdaFunctionLibrary'
 
 const packLambdaFunction    = async(
@@ -36,7 +37,7 @@ const packLambdaFunction    = async(
 function getLigo (
 
     isDockerizedLigo: boolean,
-    ligoVersion: string = "0.60.0",
+    ligoVersion: string,
 ) {
 
     let path = 'ligo'
@@ -66,14 +67,14 @@ function getLigo (
 const compileLambdaFunctionContract = async(
 
     contractPath: string = "",
-    ligoVersion: string = "0.60.0",
+    ligoVersion: string = "0.62.0",
 
 ) => {
 
     const ligo = getLigo(true, ligoVersion);
 
     const jsonFormat = execSync(
-        `${ligo} compile contract ${contractPath} --michelson-format json --protocol lima`,
+        `${ligo} compile contract ${contractPath} --michelson-format json --protocol lima --deprecated`,
         { 
             maxBuffer: 1024 * 1024,
             timeout: 1024 * 1024
@@ -107,5 +108,9 @@ export const getLambdaFunction  = async(
     const lambdaFunctionJson    = await compileLambdaFunctionContract(outputFile);
     const tezos: TezosToolkit   = new TezosToolkit(rpc)
     const packedLambdaFunction  = await packLambdaFunction(tezos, governanceProxyContractAddress, lambdaFunctionJson)
+
+    // Reset the file
+    fs.writeFileSync(outputFile, "");
+
     return packedLambdaFunction;
 }
