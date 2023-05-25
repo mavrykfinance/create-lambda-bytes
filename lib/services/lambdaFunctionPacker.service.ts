@@ -42,7 +42,7 @@ function getLigo (
 
     let path = 'ligo'
     if (isDockerizedLigo) {
-        path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i ligolang/ligo:${ligoVersion}`
+        path = `docker run --platform=linux/amd64 -v $PWD:$PWD -w $PWD --rm -i ligolang/ligo:${ligoVersion}`
 
         try {
             execSync(`${path}  --help`)
@@ -56,7 +56,7 @@ function getLigo (
             execSync(`${path}  --help`)
 
         } catch (err) {
-            path = `docker run --platform=linux/amd64 -v $PWD:$PWD --rm -i ligolang/ligo:${ligoVersion}`
+            path = `docker run --platform=linux/amd64 -v $PWD:$PWD -w $PWD --rm -i ligolang/ligo:${ligoVersion}`
             execSync(`${path}  --help`)
         }
     }
