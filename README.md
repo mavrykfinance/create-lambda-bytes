@@ -517,6 +517,27 @@ Creates a new farm.
   * `lpTokenId`: The token id of the liquidity pool token if the token is FA2.
   * `lpTokenStandard`: The standard of the liquidity pool token: `"fa12"` or `"fa2"`.
 
+## createFarmMToken
+
+**Description:**
+
+Creates a new farm using a MToken as a LPToken.
+
+**Parameters:**
+
+  * `targetContract`: The address of the farm factory contract.
+  * `farmName`: The name of the farm.
+  * `loanToken`: The loan token name in the Lending Controller contract.
+  * `addToGeneralContracts`: Whether to add the farm to the map of general contracts of the Governance contract.
+  * `forceRewardFromTransfer`: Whether to force rewards to be transferred to the farm from a treasury instead of being minted.
+  * `infinite`: Whether the farm has an infinite duration.
+  * `totalBlocks`: The total number of blocks in the farm.
+  * `currentRewardPerBlock`: The current reward per block in SMVK.
+  * `metadata`: The metadata for the farm contract in bytes.
+  * `lpTokenAddress`: The address of the liquidity pool token.
+  * `lpTokenId`: The token id of the liquidity pool token if the token is FA2.
+  * `lpTokenStandard`: The standard of the liquidity pool token: `"fa12"` or `"fa2"`.
+
 ## initFarm
 
 **Description:**

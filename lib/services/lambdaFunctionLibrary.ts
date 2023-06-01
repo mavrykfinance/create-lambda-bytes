@@ -370,6 +370,16 @@ type createFarmType is [@layout:comb] record[
     metadata                 : bytes;
     lpToken                  : farmLpTokenType;
 ]
+type createFarmMTokenType is [@layout:comb] record[
+    name                     : string;
+    loanToken                : string;
+    addToGeneralContracts    : bool;
+    forceRewardFromTransfer  : bool;
+    infinite                 : bool;
+    plannedRewards           : farmPlannedRewardsType;
+    metadata                 : bytes;
+    lpToken                  : farmLpTokenType;
+]
 
 type initFarmParamsType is [@layout:comb] record[
     totalBlocks                 : nat;
@@ -1081,6 +1091,53 @@ block {
             ("${targetContract}" : address)) : option(contract(createFarmType))) of [
                     Some(contr) -> contr
                 |   None        -> (failwith("error_CREATE_FARM_THROUGH_PROXY_LAMBDA_FAIL"))
+        ]
+    );
+} with list[contractOperation]`
+};
+
+const createFarmMToken  = (
+
+    targetContract          : string,
+    farmName                : string,
+    loanToken               : string,
+    addToGeneralContracts   : boolean,
+    forceRewardFromTransfer : boolean,
+    infinite                : boolean,
+    totalBlocks             : number,
+    currentRewardPerBlock   : number,
+    metadata                : string,
+    lpTokenAddress          : string,
+    lpTokenId               : number,
+    lpTokenStandard         : "fa12" | "fa2"
+
+) => {
+    return `function lambdaFunction (const _ : unit) : list(operation) is
+block {
+    const contractOperation : operation = Tezos.transaction(
+        record[
+            name                     = "${farmName}";
+            loanToken                = "${loanToken}";
+            addToGeneralContracts    = ${addToGeneralContracts ? "True" : "False"};
+            forceRewardFromTransfer  = ${forceRewardFromTransfer ? "True" : "False"};
+            infinite                 = ${infinite ? "True" : "False"};
+            plannedRewards           = record[
+                totalBlocks              = (${totalBlocks}n: nat);
+                currentRewardPerBlock    = ${currentRewardPerBlock}n;
+            ];
+            metadata                 = ("${metadata}": bytes);
+            lpToken                  = record[
+                tokenAddress             = ("${lpTokenAddress}" : address);
+                tokenId                  = ${lpTokenId}n;
+                tokenStandard            = (${lpTokenStandard == "fa12" ? "Fa12" : "Fa2"}: lpStandardType);
+            ];
+        ],
+        0tez,
+        case (Tezos.get_entrypoint_opt(
+            "%createFarmMToken",
+            ("${targetContract}" : address)) : option(contract(createFarmMTokenType))) of [
+                    Some(contr) -> contr
+                |   None        -> (failwith("error_CREATE_FARM_M_TOKEN_THROUGH_PROXY_LAMBDA_FAIL"))
         ]
     );
 } with list[contractOperation]`
