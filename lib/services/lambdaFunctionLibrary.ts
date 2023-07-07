@@ -19,19 +19,24 @@ type updateMetadataType is [@layout:comb] record [
     metadataHash     : bytes; 
 ]
 
+type updateType is 
+    |   Update of unit
+    |   Remove of unit
+
 type updateWhitelistContractsType is [@layout:comb] record [
-    whitelistContractName     : string;
     whitelistContractAddress  : address;
+    updateType                : updateType;
 ]
 
 type updateGeneralContractsType is [@layout:comb] record [
     generalContractName     : string;
     generalContractAddress  : address;
+    updateType              : updateType;
 ]
 
 type updateWhitelistTokenContractsType is [@layout:comb] record [
-    tokenContractName     : string;
     tokenContractAddress  : address;
+    updateType            : updateType;
 ]
 
 type aggregatorUpdateConfigActionType is 
@@ -112,7 +117,7 @@ type emergencyUpdateConfigActionType is
     |   ConfigRequiredFeeMutez          of unit
     |   ConfigStakedMvkPercentRequired  of unit
     |   ConfigMinStakedMvkForVoting     of unit
-    |   ConfigMinStakedMvkForTrigger    of unit
+    |   ConfigMinStakedMvkToTrigger     of unit
     |   ConfigProposalTitleMaxLength    of unit
     |   ConfigProposalDescMaxLength     of unit
 
@@ -142,7 +147,6 @@ type governanceUpdateConfigActionType is
         ConfigSuccessReward               of unit
     |   ConfigCycleVotersReward           of unit
     |   ConfigMinProposalRoundVotePct     of unit
-    |   ConfigMinProposalRoundVotesReq    of unit
     |   ConfigMinQuorumPercentage         of unit
     |   ConfigMinYayVotePercentage        of unit
     |   ConfigProposeFeeMutez             of unit
@@ -162,7 +166,7 @@ type governanceUpdateConfigParamsType is [@layout:comb] record [
 ]
 
 type governanceFinancialUpdateConfigActionType is
-    |   ConfigFinancialReqApprovalPct     of unit
+    |   ConfigApprovalPercentage          of unit
     |   ConfigFinancialReqDurationDays    of unit
 
 type governanceFinancialUpdateConfigParamsType is [@layout:comb] record [
@@ -172,7 +176,7 @@ type governanceFinancialUpdateConfigParamsType is [@layout:comb] record [
 
 type governanceSatelliteUpdateConfigActionType is 
         ConfigApprovalPercentage          of unit
-    |   ConfigSatelliteDurationInDays     of unit
+    |   ConfigActionDurationInDays        of unit
     |   ConfigPurposeMaxLength            of unit
     |   ConfigMaxActionsPerSatellite      of unit
 
@@ -182,7 +186,6 @@ type governanceSatelliteUpdateConfigParamsType is [@layout:comb] record [
 ]
 
 type lendingControllerUpdateConfigActionType is 
-        
         ConfigCollateralRatio           of unit
     |   ConfigLiquidationRatio          of unit
     |   ConfigLiquidationFeePercent     of unit
@@ -190,7 +193,6 @@ type lendingControllerUpdateConfigActionType is
     |   ConfigMinimumLoanFeePercent     of unit
     |   ConfigMinLoanFeeTreasuryShare   of unit
     |   ConfigInterestTreasuryShare     of unit
-    |   ConfigMockLevel                 of unit
 
 type lendingControllerUpdateConfigParamsType is [@layout:comb] record [
     updateConfigNewValue    : nat;  
@@ -252,6 +254,7 @@ type delegationTogglePauseEntrypointType is [@layout:comb] record [
 type doormanPausableEntrypointType is
         Stake                         of bool
     |   Unstake                       of bool
+    |   Exit                          of bool
     |   Compound                      of bool
     |   FarmClaim                     of bool
     |   OnVaultDepositStake           of bool
@@ -551,10 +554,6 @@ type setCollateralTokenActionType is [@layout:comb] record [
     empty       : unit;
 ]
 
-type updateType is 
-    |   Update of unit
-    |   Remove of unit
-
 type actionType is 
         // Default Entrypoint to Receive Tez
         Default                       of unit
@@ -721,7 +720,6 @@ block {
 const updateWhitelistContracts  = (
 
     targetContract: string,
-    whitelistContractName: string,
     whitelistContractAddress: string,
     updateType: "Update" | "Remove"
 
@@ -730,7 +728,6 @@ const updateWhitelistContracts  = (
 block {
     const contractOperation : operation = Tezos.transaction(
         record [
-            whitelistContractName     = "${whitelistContractName}";
             whitelistContractAddress  = ("${whitelistContractAddress}" : address);
             updateType                = (${updateType} : updateType);
         ],
@@ -775,7 +772,6 @@ block {
 const updateWhitelistTokenContracts  = (
 
     targetContract: string,
-    tokenContractName: string,
     tokenContractAddress: string,
     updateType: "Update" | "Remove"
 
@@ -784,7 +780,6 @@ const updateWhitelistTokenContracts  = (
 block {
     const contractOperation : operation = Tezos.transaction(
         record [
-            tokenContractName     = "${tokenContractName}";
             tokenContractAddress  = ("${tokenContractAddress}" : address);
             updateType            = (${updateType} : updateType);
         ],
@@ -873,10 +868,6 @@ const updateConfig  = (
             ligoConfigActionType    = "vaultFactoryUpdateConfigActionType"
             break;
     }
-
-    // console.log(`updateConfigAction: (${updateConfigAction + ':' + ligoConfigActionType})`)
-    // console.log(`updateConfigAction: (${updateConfigAction + "(Unit)" + ':' + ligoConfigActionType})`)
-    // console.log(`updateConfigAction: (${lowercaseFirstLetter(updateConfigAction) + ':' + ligoConfigActionType})`)
 
     return `function lambdaFunction (const _ : unit) : list(operation) is
 block {
