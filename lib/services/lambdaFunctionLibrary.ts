@@ -549,11 +549,6 @@ type setCollateralTokenType is
 type setCollateralTokenActionType is [@layout:comb] record [
     action      : setCollateralTokenType;
     empty       : unit;
-]
-
-type updateType is 
-    |   Update of unit
-    |   Remove of unit
 
 type actionType is 
         // Default Entrypoint to Receive Tez
@@ -722,8 +717,7 @@ const updateWhitelistContracts  = (
 
     targetContract: string,
     whitelistContractName: string,
-    whitelistContractAddress: string,
-    updateType: "Update" | "Remove"
+    whitelistContractAddress: string
 
 ) => {
     return `function lambdaFunction (const _ : unit) : list(operation) is
@@ -732,7 +726,6 @@ block {
         record [
             whitelistContractName     = "${whitelistContractName}";
             whitelistContractAddress  = ("${whitelistContractAddress}" : address);
-            updateType                = (${updateType} : updateType);
         ],
         0tez,
         case (Tezos.get_entrypoint_opt(
@@ -749,8 +742,7 @@ const updateGeneralContracts  = (
 
     targetContract: string,
     generalContractName: string,
-    generalContractAddress: string,
-    updateType: "Update" | "Remove"
+    generalContractAddress: string
 
 ) => {
     return `function lambdaFunction (const _ : unit) : list(operation) is
@@ -759,7 +751,6 @@ block {
         record [
             generalContractName     = "${generalContractName}";
             generalContractAddress  = ("${generalContractAddress}" : address);
-            updateType              = (${updateType} : updateType);
         ],
         0tez,
         case (Tezos.get_entrypoint_opt(
@@ -776,8 +767,7 @@ const updateWhitelistTokenContracts  = (
 
     targetContract: string,
     tokenContractName: string,
-    tokenContractAddress: string,
-    updateType: "Update" | "Remove"
+    tokenContractAddress: string
 
 ) => {
     return `function lambdaFunction (const _ : unit) : list(operation) is
@@ -786,7 +776,6 @@ block {
         record [
             tokenContractName     = "${tokenContractName}";
             tokenContractAddress  = ("${tokenContractAddress}" : address);
-            updateType            = (${updateType} : updateType);
         ],
         0tez,
         case (Tezos.get_entrypoint_opt(
