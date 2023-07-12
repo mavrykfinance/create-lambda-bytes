@@ -549,6 +549,7 @@ type setCollateralTokenType is
 type setCollateralTokenActionType is [@layout:comb] record [
     action      : setCollateralTokenType;
     empty       : unit;
+]
 
 type actionType is 
         // Default Entrypoint to Receive Tez
